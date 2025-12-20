@@ -93,8 +93,6 @@ We're focusing on these areas (in order of priority):
    - Screenshot/video capture
    - Command-line options
 
-**Not sure where to start?** Check issues labeled [`good first issue`](https://github.com/mdmmt05/Arduino_TFT_simulator/labels/good%20first%20issue) or [`help wanted`](https://github.com/mdmmt05/Arduino_TFT_simulator/labels/help%20wanted).
-
 ---
 
 ## 🔧 Development Setup
@@ -283,7 +281,6 @@ We plan to add automated tests in the future. Contributions to testing infrastru
    - [ ] Tested with provided examples
    - [ ] Tested with custom sketch
    - [ ] No errors or warnings
-   ```
 
 ### Review Process
 
