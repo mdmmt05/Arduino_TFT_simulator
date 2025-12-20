@@ -1,4 +1,4 @@
-# TFT Display Simulator for Arduino
+# Arduino TFT Simulator
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.7+](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/)
@@ -65,16 +65,17 @@ Developing TFT display interfaces for Arduino is **slow and frustrating**:
 # Install pygame
 pip install pygame
 
-# Download simulator
-git clone https://github.com/yourusername/tft-simulator.git
-cd tft-simulator
+# Clone repository
+git clone https://github.com/mdmmt05/Arduino_TFT_simulator.git
+cd Arduino_TFT_simulator
 
 # Run example
-python tft_simulator_interactive.py examples/dashboard.ino
+python tft_simulator_interactive_v2.py main_interface.txt
 ```
 
 ### Basic Example
 
+**File: main_interface.txt**
 ```cpp
 #include <TFT_eSPI.h>
 
@@ -86,13 +87,21 @@ void setup() {
   tft.fillScreen(TFT_BLACK);
   
   // Draw rectangle border
-  tft.drawRect(10, 10, 460, 300, TFT_CYAN);
+  int margin = 7;
+  int thickness = 3;
+  
+  for(int i = 0; i < thickness; i++) {
+    tft.drawRect(margin + i, margin + i, 
+                 480 - (2 * margin) - (2 * i), 
+                 320 - (2 * margin) - (2 * i), 
+                 0xEB8015);
+  }
   
   // Display text
-  tft.setCursor(50, 50);
-  tft.setTextColor(TFT_WHITE);
+  tft.setCursor(20, 20, 2);
+  tft.setTextColor(0xEB8015);
   tft.setTextFont(7);
-  tft.println("5280 RPM");
+  tft.println("RPM");
 }
 
 void loop() {}
@@ -100,44 +109,37 @@ void loop() {}
 
 **Run it:**
 ```bash
-python tft_simulator_interactive.py my_sketch.ino
+python tft_simulator_interactive_v2.py main_interface.txt
 ```
 
 **Result:** Instant window showing your TFT output! 🎉
 
 ---
 
-## 📚 Comprehensive Examples
+## 📚 Examples
 
-### Dashboard with Gauges
+### Example 1: RPM Display (main_interface.txt)
 ```cpp
-tft.fillRoundRect(10, 10, 460, 100, 15, TFT_MAROON);
+tft.fillScreen(TFT_BLACK);
+for(int i = 0; i < 3; i++) {
+  tft.drawRect(7 + i, 7 + i, 466 - (2*i), 306 - (2*i), 0xEB8015);
+}
+tft.setCursor(20, 20);
+tft.setTextColor(0xEB8015);
 tft.setTextFont(7);
-tft.setTextColor(0xEB8015);  // Orange
-tft.setCursor(50, 30);
-tft.println("120 km/h");
+tft.println("RPM");
 ```
 
-### Bitmap Logo Display
+### Example 2: Bitmap Logo (graphic.txt)
 ```cpp
-const unsigned char logo[] PROGMEM = {
-  0x00, 0xFF, 0x7E, ... // bitmap data
+const unsigned char manufacture[] PROGMEM = {
+  0x00, 0x00, 0x00, ... // 5000 bytes bitmap data
 };
 
-tft.drawBitmap(100, 50, logo, 64, 64, TFT_WHITE);
+tft.drawBitmap(100, 100, manufacture, 200, 200, 0xadff00);
 ```
 
-### Multi-Font Text
-```cpp
-tft.setTextFont(2);
-tft.print("Speed: ");
-tft.setTextFont(6);
-tft.print("120");
-tft.setTextFont(2);
-tft.print(" km/h");
-```
-
-More examples in [`/examples`](examples/) folder!
+Both examples are included in the repository!
 
 ---
 
@@ -146,6 +148,8 @@ More examples in [`/examples`](examples/) folder!
 Load custom TTF/OTF fonts for professional displays:
 
 ```python
+from tft_simulator_interactive_v2 import TFTSimulator
+
 sim = TFTSimulator()
 
 # Use digital-7 font for Font 7 (RPM displays)
@@ -153,6 +157,11 @@ sim.setCustomFont(7, "./fonts/digital-7.ttf")
 
 # Or set default font for all
 sim.setDefaultCustomFont("./fonts/my-font.ttf")
+
+# Load and execute Arduino code
+with open("main_interface.txt") as f:
+    code = f.read()
+sim.parse_and_execute(code)
 ```
 
 Perfect for:
@@ -221,7 +230,7 @@ The simulator **doesn't care** which library you're using - it only parses the *
 - ✅ `tft.print("text")`
 - ✅ `tft.println("text")`
 - ✅ `tft.drawString("text", x, y, font)`
-- ✅ Custom TTF/OTF font loading
+- ✅ Custom TTF/OTF font loading (via Python API)
 
 ### Images
 - ✅ `tft.drawBitmap(x, y, array, w, h, color)` - Monochrome bitmaps
@@ -240,7 +249,7 @@ The simulator **doesn't care** which library you're using - it only parses the *
 ### Code Features
 - ✅ Variables: `int x = 10;`
 - ✅ Math expressions: `width - (2 * margin)`
-- ✅ For loops (nested, multiple increment styles)
+- ✅ For loops (nested, multiple increment styles: `i++`, `i+=n`, `i=i+n`)
 
 ---
 
@@ -252,7 +261,7 @@ The simulator **doesn't care** which library you're using - it only parses the *
 - ⏳ Text datum/alignment settings
 - ⏳ `drawCentreString()`, `drawRightString()`
 
-> **Note on Font Integration**: While the simulator supports loading custom TTF/OTF fonts through Python API, it **does not yet support** TFT_eSPI's `setFreeFont()` or `setFont()` functions that load fonts defined in Arduino code (e.g., from the Fonts folder). This is a planned feature for future releases.
+> **Note on Font Integration**: While the simulator supports loading custom TTF/OTF fonts through Python API (`setCustomFont()`), it **does not yet support** TFT_eSPI's `setFreeFont()` or `setFont()` functions that load fonts defined in Arduino code (e.g., from the Fonts folder). This is a planned feature for future releases.
 
 ### Images
 - ⏳ Color bitmaps (RGB565, RGB888)
@@ -287,7 +296,7 @@ The simulator **doesn't care** which library you're using - it only parses the *
 ## 🎮 Controls
 
 - **ESC** or **Close Window**: Exit simulator
-- Window shows display at 1:1 scale (no upscaling)
+- Window shows display at 1:1 scale (no upscaling by default)
 
 ---
 
@@ -301,10 +310,7 @@ int displayWidth = 480;
 int displayHeight = 320;
 ```
 
-Or modify in Python:
-```python
-sim = TFTSimulator(width=800, height=480)  # 7" display
-```
+Or modify the simulator code to change defaults.
 
 ---
 
@@ -327,24 +333,18 @@ Show TFT output in presentations without hardware
 
 ---
 
-## 🏗️ Project Structure
+## 🏗️ Repository Structure
 
 ```
-tft-simulator/
-├── tft_simulator_interactive.py    # Main simulator
-├── examples/                        # Example Arduino sketches
-│   ├── dashboard.ino
-│   ├── gauges.ino
-│   └── bitmap_demo.ino
-├── fonts/                           # Optional custom fonts
-│   └── digital-7.ttf
-├── docs/
-│   ├── BITMAP_GUIDE.md
-│   ├── CUSTOM_FONTS_GUIDE.md
-│   └── API_REFERENCE.md
+Arduino_TFT_simulator/
+├── tft_simulator_interactive_v2.py  # Main simulator (v2.2)
+├── main_interface.txt               # Example 1: RPM display
+├── graphic.txt                      # Example 2: Bitmap logo
 ├── README.md                        # This file
-├── CHANGELOG.md
-└── LICENSE
+├── CHANGELOG.md                     # Version history
+├── BITMAP_GUIDE.md                  # Bitmap usage guide
+├── CUSTOM_FONTS_GUIDE.md            # Custom fonts guide
+└── LICENSE                          # MIT License
 ```
 
 ---
@@ -370,6 +370,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 - ✅ Bitmap/image support (monochrome)
 - ✅ PROGMEM array parsing
 - ✅ Custom font loading via Python API
+- ✅ No upscaling (1:1 display)
 
 ### v2.1
 - ✅ Corrected font sizes (Font 7: 75px, Font 8: 90px)
@@ -398,7 +399,7 @@ See [CHANGELOG.md](CHANGELOG.md) for complete history.
 4. **No touch input**: Mouse clicks not simulated
 5. **Performance**: Large bitmaps may be slow (Python pixel-by-pixel rendering)
 
-See [Issues](https://github.com/yourusername/tft-simulator/issues) for more.
+See [Issues](https://github.com/mdmmt05/Arduino_TFT_simulator/issues) for more.
 
 ---
 
@@ -419,9 +420,9 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## 📧 Contact & Support
 
-- **GitHub Issues**: [Report bugs or request features](https://github.com/yourusername/tft-simulator/issues)
-- **Discussions**: [Ask questions or share projects](https://github.com/yourusername/tft-simulator/discussions)
-- **Hackster.io**: [Full tutorial article](https://hackster.io/link-to-article)
+- **GitHub Issues**: [Report bugs or request features](https://github.com/mdmmt05/Arduino_TFT_simulator/issues)
+- **GitHub Discussions**: [Ask questions or share projects](https://github.com/mdmmt05/Arduino_TFT_simulator/discussions)
+- **Hackster.io**: Article coming soon!
 
 ---
 
@@ -430,6 +431,21 @@ MIT License - see [LICENSE](LICENSE) file for details.
 If this project helped you, please star it! ⭐
 
 It encourages development and helps others discover this tool.
+
+---
+
+## 🚀 Quick Command Reference
+
+```bash
+# Basic usage
+python tft_simulator_interactive_v2.py main_interface.txt
+
+# With bitmap example
+python tft_simulator_interactive_v2.py graphic.txt
+
+# Your own sketch
+python tft_simulator_interactive_v2.py your_sketch.ino
+```
 
 ---
 
