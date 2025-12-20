@@ -1,0 +1,112 @@
+#include <TFT_eSPI.h>
+
+TFT_eSPI tft = TFT_eSPI();
+
+void setup() {
+  tft.init();
+  tft.setRotation(1); // Regola se necessario
+  tft.fillScreen(TFT_BLACK);
+  
+  // Dimensioni display
+  int displayWidth = 480;
+  int displayHeight = 320;
+  int margin = 7;
+  int thickness = 3;
+  
+  tft.setCursor(45, 10, 2);
+  
+  tft.setTextColor(0xEB8015);
+  tft.drawLine(140,0,140,320,0xEB8015);
+  tft.setTextFont(2);
+  tft.println("AVG");
+  tft.setCursor(25, 30, 2);
+  tft.setTextFont(2);
+  tft.println("114kmh");
+  tft.drawLine(0,60,140,60,0xEB8015);
+
+  tft.drawLine(0,260,140,260,0xEB8015);
+  tft.setTextFont(2);
+  tft.setCursor(30, 284, 2);
+  tft.println("SPORT");
+
+  tft.setCursor(20, 70, 2);
+  tft.setTextFont(1);
+  tft.println("ENGINE VITALS");
+  tft.setCursor(15, 90, 2);
+  tft.setTextFont(2);
+  tft.println("Coolant");
+  tft.setCursor(35, 115, 2);
+  tft.setTextFont(2);
+  tft.println("115°C");
+  tft.setCursor(25, 150, 2);
+  tft.setTextFont(2);
+  tft.println("Intake");
+  tft.setCursor(45, 175, 2);
+  tft.setTextFont(2);
+  tft.println("37°C");
+  tft.setCursor(24, 210, 2);
+  tft.setTextFont(1);
+  tft.println("ENGINE STATE");
+  tft.setCursor(17, 230, 2);
+  tft.setTextFont(2);
+  tft.println("NOMINAL");
+
+  tft.drawLine(340, 0, 340, 200, 0xEB8015);
+  tft.drawLine(340, 145, 480, 145, 0xEB8015);
+  tft.setCursor(363, 10, 2);
+  tft.setTextFont(1);
+  tft.println("ACCELERATION");
+  tft.setCursor(387, 30, 2);
+  tft.setTextFont(2);
+  tft.println("Lon");
+  tft.setCursor(370, 55, 2);
+  tft.setTextFont(2);
+  tft.println("-2.3G");
+  tft.setCursor(387, 90, 2);
+  tft.setTextFont(2);
+  tft.println("Lat");
+  tft.setCursor(370, 115, 2);
+  tft.setTextFont(2);
+  tft.println("+0.8G");
+
+  tft.drawLine(140, 200, 480, 200, 0xEB8015);
+  tft.setCursor(360, 155, 2);
+  tft.setTextFont(1);
+  tft.println("LIGHTING ALGO");
+  tft.setCursor(377, 170, 2);
+  tft.setTextFont(1);
+  tft.println("RPM Fade");
+  tft.setCursor(395, 185, 2);
+  tft.setTextFont(1);
+  tft.println("Blue");
+
+  tft.setCursor(200, 60, 2);
+  tft.setTextFont(8);
+  tft.println("1");
+  
+  //tft.drawLine(310, 200, 310, 320, 0xEB8015)
+  tft.setCursor(190, 210, 2);
+  tft.setTextFont(1);
+  tft.println("LAST TIME");
+  tft.setCursor(187, 230, 2);
+  tft.println("02:30");
+  tft.setCursor(190, 270, 2);
+  tft.setTextFont(1);
+  tft.println("MAX SPEED");
+  tft.setCursor(187, 290, 2);
+  tft.println("78kmh");
+  tft.setCursor(347, 210, 2);
+  tft.setTextFont(1);
+  tft.println("MAX LONG ACC");
+  tft.setCursor(354, 230, 2);
+  tft.println("-2.3G");
+  tft.setCursor(350, 270, 2);
+  tft.setTextFont(1);
+  tft.println("MAX LAT ACC");
+  tft.setCursor(354, 290, 2);
+  tft.println("+3.4G");
+}
+
+void loop() {
+  // Il tuo codice
+}
