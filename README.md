@@ -6,7 +6,7 @@
 
 **The first comprehensive TFT display simulator for Arduino development** - No hardware needed!
 
-> **Note**: While OLED simulators exist, this is the first full-featured simulator specifically designed for TFT displays with Arduino. Test your TFT graphics code instantly on your PC before uploading to hardware!
+> **Note**: This is a Python script. Thus you will need Python installed on your machine to have it work correctly. Read the full README for more details.
 
 ---
 
