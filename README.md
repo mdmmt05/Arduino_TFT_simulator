@@ -1,385 +1,199 @@
 # Arduino TFT Simulator
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.7+](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey)]()
 
-**The first comprehensive TFT display simulator for Arduino development** - No hardware needed!
+> Python-based simulator for prototyping Arduino-style TFT interfaces without repeatedly flashing physical hardware.
 
-> **Note**: This is a Python script. Thus you will need Python installed on your machine to have it work correctly. Read the full README for more details.
+Arduino TFT Simulator interprets a subset of common `tft.xxx()` drawing commands and renders the resulting interface on a desktop computer. It was created to speed up experimentation with embedded display layouts, gauges, text, colours, and monochrome bitmaps.
 
----
+## Project status
 
-## 🎯 Why This Project?
+This repository is a **software prototyping tool**, not a cycle-accurate or library-accurate emulator of TFT hardware.
 
-Developing TFT display interfaces for Arduino is **slow and frustrating**:
-- ❌ Upload code → Wait → See result → Repeat
-- ❌ No OLED-style simulation tools available for TFT
-- ❌ Difficult to iterate on UI designs
-- ❌ Wasted time on syntax errors and layout bugs
+It approximates selected Arduino/TFT graphics calls well enough for UI prototyping, but it does not emulate the underlying display controller, timing behaviour, DMA, touch interfaces, or every feature of TFT_eSPI / Adafruit_GFX / other libraries.
 
-**This simulator solves all of that:**
-- ✅ Instant visual feedback - see changes immediately
-- ✅ Iterate 10x faster on designs
-- ✅ Catch bugs before uploading to hardware
-- ✅ Perfect for prototyping dashboards, gauges, and UIs
+## Development approach and authorship
 
----
+This project was developed with **heavy AI assistance**.
 
-## ✨ Key Features
+The author defined the original need, intended workflow, supported command families, expected simulator behaviour, and practical use cases. AI tools were used extensively to generate and expand the Python implementation, add parsers and rendering features, refactor code, and review the assembled program.
 
-### 🎨 Graphics Primitives
-- **Shapes**: Rectangles, circles, triangles, rounded rectangles
-- **Lines & Pixels**: Draw individual pixels or lines
-- **Fill & Outline**: Both filled and outline versions of all shapes
+The author's role was mainly to:
 
-### 📝 Text Rendering
-- **8 Font Sizes**: Font 1-8 with accurate TFT_eSPI dimensions
-- **Custom Fonts**: Load your own TTF/OTF fonts (digital-7, etc.)
-- **Text Positioning**: `setCursor()`, `print()`, `println()`
-- **Inline Font Changes**: Switch fonts mid-line
+- define what Arduino constructs the simulator should accept;
+- specify the expected visual behaviour;
+- test outputs against intended interfaces;
+- integrate generated additions;
+- identify missing or incorrect behaviour;
+- request iterative corrections and extensions.
 
-### 🖼️ Bitmap/Image Support
-- **Monochrome Bitmaps**: 1-bit images (logos, icons)
-- **PROGMEM Arrays**: Automatic parsing of `const unsigned char[]`
-- **Any Size**: From 16×16 icons to 512×512 images
-- **Custom Colors**: Render bitmaps in any color
+Accordingly, this repository demonstrates the specification and integration of a useful engineering tool through an AI-assisted workflow rather than fully manual Python implementation.
 
-### 🔧 Display Control
-- **Rotation**: 0-3 (0°, 90°, 180°, 270°)
-- **Screen Fill**: `fillScreen()` with any color
-- **Variable Size**: Configure display dimensions
+## Why it exists
 
-### 💡 Code Features
-- **Variables & Math**: `int margin = 10; width - (2 * margin)`
-- **For Loops**: Nested loops with various increment styles
-- **Color Formats**: RGB565, RGB888, named colors (TFT_RED, etc.)
+Embedded TFT interface development often involves a slow edit-build-flash-check cycle. This simulator allows a subset of display code to be previewed on a PC before deployment to hardware.
 
----
+Typical uses include:
 
-## 🚀 Quick Start
+- layout prototyping;
+- dashboard and gauge design;
+- bitmap placement;
+- quick validation of coordinates and dimensions;
+- producing screenshots for documentation;
+- experimenting without having the target display connected.
 
-### Installation
+## Main features
+
+### Graphics primitives
+
+Supported operations include:
+
+- rectangles and rounded rectangles;
+- circles;
+- triangles;
+- lines;
+- individual pixels;
+- filled and outline variants.
+
+### Text
+
+The simulator supports operations such as:
+
+- `setCursor()`;
+- `setTextColor()`;
+- `setTextFont()`;
+- `setTextSize()`;
+- `print()` / `println()`;
+- `drawString()`;
+- optional TTF/OTF font substitution through the Python API.
+
+Font rendering is an approximation and does not reproduce TFT_eSPI built-in fonts exactly.
+
+### Bitmaps
+
+Supported functionality includes:
+
+- monochrome bitmaps;
+- parsing of `PROGMEM` byte arrays;
+- configurable bitmap colour.
+
+### Display behaviour
+
+Implemented features include:
+
+- rotation values 0–3;
+- `fillScreen()`;
+- configurable display dimensions;
+- common named TFT colours;
+- RGB565 and RGB888 colour inputs.
+
+### Basic code parsing
+
+The simulator can interpret a limited subset of Arduino-like constructs, including:
+
+- simple variables;
+- arithmetic expressions;
+- selected `for` loops;
+- `tft.function(...)` drawing calls.
+
+It is not a general C/C++ interpreter.
+
+## Quick start
 
 ```bash
-# Install pygame
 pip install pygame
-
-# Clone repository
 git clone https://github.com/mdmmt05/Arduino_TFT_simulator.git
 cd Arduino_TFT_simulator
-
-# Run example
 python tft_simulator_interactive_v2.py main_interface.txt
 ```
 
-
-## 🎨 Custom Fonts
-
-Load custom TTF/OTF fonts for professional displays:
+## Custom fonts
 
 ```python
 from tft_simulator_interactive_v2 import TFTSimulator
 
 sim = TFTSimulator()
-
-# Use digital-7 font for Font 7 (RPM displays)
 sim.setCustomFont(7, "./fonts/digital-7.ttf")
 
-# Or set default font for all
-sim.setDefaultCustomFont("./fonts/my-font.ttf")
-
-# Load and execute Arduino code
 with open("main_interface.txt") as f:
     code = f.read()
+
 sim.parse_and_execute(code)
 ```
 
-Perfect for:
-- Digital speedometers (Digital-7, DSEG7)
-- Racing dashboards (Eurostile, Orbitron)
-- Retro displays (Calculator fonts)
-
-See [CUSTOM_FONTS_GUIDE.md](CUSTOM_FONTS_GUIDE.md) for details.
-
----
-
-## 🖼️ Bitmap/Image Support
-
-Convert images to Arduino-compatible bitmaps:
-
-1. **Use online converter**: http://javl.github.io/image2cpp/
-2. **Copy generated array** to your Arduino code
-3. **Simulator renders automatically**!
+## Bitmap example
 
 ```cpp
 const unsigned char myLogo[] PROGMEM = {
-  0x00, 0xFF, ... // from image2cpp
+  0x00, 0xFF /* ... */
 };
 
 tft.drawBitmap(100, 50, myLogo, 64, 64, TFT_GREEN);
 ```
 
-See [BITMAP_GUIDE.md](BITMAP_GUIDE.md) for complete guide.
+## Selected supported calls
 
----
-
-## 🔧 Library-Agnostic Design
-
-**Important**: This simulator is **library-agnostic**. It works with any Arduino TFT library that uses the `tft.xxx()` syntax:
-
-✅ **Supported Libraries:**
-- TFT_eSPI (primary target)
-- Adafruit_GFX + display drivers
-- UTFT
-- Arduino_GFX
-- Any library using `tft.drawRect()`, `tft.print()`, etc.
-
-The simulator **doesn't care** which library you're using - it only parses the **command syntax**, not library implementations. As long as your code uses `tft.functionName()` format, it will work!
-
----
-
-## ✅ Supported Features
-
-### Graphics
-- ✅ `tft.drawRect(x, y, w, h, color)`
-- ✅ `tft.fillRect(x, y, w, h, color)`
-- ✅ `tft.drawCircle(x, y, r, color)`
-- ✅ `tft.fillCircle(x, y, r, color)`
-- ✅ `tft.drawTriangle(x0, y0, x1, y1, x2, y2, color)`
-- ✅ `tft.fillTriangle(x0, y0, x1, y1, x2, y2, color)`
-- ✅ `tft.drawRoundRect(x, y, w, h, r, color)`
-- ✅ `tft.fillRoundRect(x, y, w, h, r, color)`
-- ✅ `tft.drawLine(x0, y0, x1, y1, color)`
-- ✅ `tft.drawPixel(x, y, color)`
-
-### Text
-- ✅ `tft.setCursor(x, y, font)`
-- ✅ `tft.setTextColor(color)`
-- ✅ `tft.setTextFont(1-8)` - Accurate TFT_eSPI sizes
-- ✅ `tft.setTextSize(1-7)` - Size multiplier
-- ✅ `tft.print("text")`
-- ✅ `tft.println("text")`
-- ✅ `tft.drawString("text", x, y, font)`
-- ✅ Custom TTF/OTF font loading (via Python API)
-
-### Images
-- ✅ `tft.drawBitmap(x, y, array, w, h, color)` - Monochrome bitmaps
-- ✅ Automatic `PROGMEM` array parsing
-
-### Display
-- ✅ `tft.init()`
-- ✅ `tft.setRotation(0-3)`
-- ✅ `tft.fillScreen(color)`
-
-### Colors
-- ✅ Named colors: `TFT_BLACK`, `TFT_WHITE`, `TFT_RED`, etc. (20+ colors)
-- ✅ RGB565 format: `0xF800` (red)
-- ✅ RGB888 format: `0xFF0000` (red)
-
-### Code Features
-- ✅ Variables: `int x = 10;`
-- ✅ Math expressions: `width - (2 * margin)`
-- ✅ For loops (nested, multiple increment styles: `i++`, `i+=n`, `i=i+n`)
-
----
-
-## ❌ Not Yet Supported
-
-### Text Features
-- ⏳ `setFreeFont()` / `setFont()` - **Custom font integration from Arduino code**
-- ⏳ Text background colors
-- ⏳ Text datum/alignment settings
-- ⏳ `drawCentreString()`, `drawRightString()`
-
-> **Note on Font Integration**: While the simulator supports loading custom TTF/OTF fonts through Python API (`setCustomFont()`), it **does not yet support** TFT_eSPI's `setFreeFont()` or `setFont()` functions that load fonts defined in Arduino code (e.g., from the Fonts folder). This is a planned feature for future releases.
-
-### Images
-- ⏳ Color bitmaps (RGB565, RGB888)
-- ⏳ External image files (.bmp, .png, .jpg)
-- ⏳ `pushImage()` function
-- ⏳ Image rotation/scaling
-- ⏳ Sprites/TFT_eSprite
-
-### Advanced Graphics
-- ⏳ `drawArc()`, `fillArc()`
-- ⏳ `drawEllipse()`, `fillEllipse()`
-- ⏳ Bezier curves
-- ⏳ Anti-aliasing
-- ⏳ Gradients
-
-### Display Features
-- ⏳ `invertDisplay()`
-- ⏳ Partial screen updates
-- ⏳ DMA/double buffering simulation
-- ⏳ Touch input simulation
-
-### Code Features
-- ⏳ `loop()` function execution (currently only `setup()`)
-- ⏳ `delay()` / timing simulation
-- ⏳ Animation playback
-- ⏳ Serial output capture
-
-**Want to contribute?** These features are great candidates for PRs! See [CONTRIBUTING.md](CONTRIBUTING.md).
-
----
-
-## 🎮 Controls
-
-- **ESC** or **Close Window**: Exit simulator
-- Window shows display at 1:1 scale (no upscaling by default)
-
----
-
-## 📐 Display Configuration
-
-Default: 480×320 (standard TFT size)
-
-Configure in your Arduino code:
-```cpp
-int displayWidth = 480;
-int displayHeight = 320;
+```text
+tft.drawRect(...)
+tft.fillRect(...)
+tft.drawCircle(...)
+tft.fillCircle(...)
+tft.drawTriangle(...)
+tft.fillTriangle(...)
+tft.drawRoundRect(...)
+tft.fillRoundRect(...)
+tft.drawLine(...)
+tft.drawPixel(...)
+tft.setCursor(...)
+tft.setTextColor(...)
+tft.setTextFont(...)
+tft.setTextSize(...)
+tft.print(...)
+tft.println(...)
+tft.drawString(...)
+tft.drawBitmap(...)
+tft.setRotation(...)
+tft.fillScreen(...)
 ```
 
-Or modify the simulator code to change defaults.
+## Not supported / limitations
 
----
+Current limitations include:
 
-## 🎯 Use Cases
+- no complete `loop()` execution model;
+- no timing-accurate `delay()` simulation;
+- no animation engine;
+- no touch-input simulation;
+- no TFT DMA or double-buffering behaviour;
+- no sprites / `TFT_eSprite`;
+- no complete `setFreeFont()` / Arduino font parsing;
+- no colour-image pipeline comparable to real embedded libraries;
+- no guarantee of compatibility with arbitrary Arduino code;
+- system fonts only approximate actual display fonts;
+- large bitmaps may render slowly.
 
-### Rapid Prototyping
-Iterate on UI designs 10x faster without hardware
+The simulator is library-agnostic only in the limited sense that it recognizes selected `tft.xxx()` command patterns; it does **not** emulate the internals of every library exposing that syntax.
 
-### Educational
-Perfect for teaching Arduino graphics programming
+## Repository structure
 
-### Code Validation
-Catch layout bugs before uploading to hardware
-
-### Documentation
-Generate screenshots for project documentation
-
-### Demonstrations
-Show TFT output in presentations without hardware
-
----
-
-## 🏗️ Repository Structure
-
-```
+```text
 Arduino_TFT_simulator/
-├── tft_simulator_interactive_v2.py  # Main simulator (v2.2)
-├── main_interface.txt               # Example 1: RPM display
-├── graphic.txt                      # Example 2: Bitmap logo
-├── README.md                        # This file
-├── CHANGELOG.md                     # Version history
-├── BITMAP_GUIDE.md                  # Bitmap usage guide
-├── CUSTOM_FONTS_GUIDE.md            # Custom fonts guide
-└── LICENSE                          # MIT License
+├── tft_simulator_interactive_v2.py
+├── main_interface.txt
+├── graphic.txt
+├── README.md
+├── CHANGELOG.md
+├── BITMAP_GUIDE.md
+├── CUSTOM_FONTS_GUIDE.md
+└── LICENSE
 ```
 
----
+## Repository purpose
 
-## 🤝 Contributing
+This project is retained as a practical experiment in building a desktop tool around an embedded-development workflow. It is particularly useful as documentation of the problem definition, supported feature set, and iterative testing process used to create the simulator.
 
-Contributions welcome! Priority areas:
+## License
 
-1. **Arduino font integration** (`setFreeFont()`, `setFont()`)
-2. **Missing TFT_eSPI features** (sprites, arcs, etc.)
-3. **Animation support** (loop() execution)
-4. **Image formats** (RGB bitmaps, PNG loading)
-5. **Touch simulation**
-6. **Performance optimization**
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
----
-
-## 📝 Version History
-
-### v2.2 (Current)
-- ✅ Bitmap/image support (monochrome)
-- ✅ PROGMEM array parsing
-- ✅ Custom font loading via Python API
-- ✅ No upscaling (1:1 display)
-
-### v2.1
-- ✅ Corrected font sizes (Font 7: 75px, Font 8: 90px)
-- ✅ Inline font switching
-- ✅ Proper cursor tracking
-
-### v2.0
-- ✅ Text rendering support
-- ✅ 8 font sizes
-- ✅ Color text
-
-### v1.0
-- ✅ Basic graphics primitives
-- ✅ Display rotation
-- ✅ For loop support
-
-See [CHANGELOG.md](CHANGELOG.md) for complete history.
-
----
-
-## 🐛 Known Issues
-
-1. **Font rendering**: Uses system fonts instead of TFT_eSPI built-in fonts (close approximation)
-2. **Arduino font integration**: `setFreeFont()` not yet supported
-3. **`loop()` not executed**: Only `setup()` runs (animations not supported yet)
-4. **No touch input**: Mouse clicks not simulated
-5. **Performance**: Large bitmaps may be slow (Python pixel-by-pixel rendering)
-
-See [Issues](https://github.com/mdmmt05/Arduino_TFT_simulator/issues) for more.
-
----
-
-## 📄 License
-
-MIT License - see [LICENSE](LICENSE) file for details.
-
----
-
-## 🙏 Acknowledgments
-
-- **TFT_eSPI Library** by Bodmer - Inspiration for command syntax
-- **pygame** - Rendering engine
-- **image2cpp** - Bitmap conversion tool
-- Arduino community for feedback and testing
-
----
-
-## 📧 Contact & Support
-
-- **GitHub Issues**: [Report bugs or request features](https://github.com/mdmmt05/Arduino_TFT_simulator/issues)
-- **GitHub Discussions**: [Ask questions or share projects](https://github.com/mdmmt05/Arduino_TFT_simulator/discussions)
-- **Hackster.io**: Article coming soon!
-
----
-
-## ⭐ Star History
-
-If this project helped you, please star it! ⭐
-
-It encourages development and helps others discover this tool.
-
----
-
-## 🚀 Quick Command Reference
-
-```bash
-# Basic usage
-python tft_simulator_interactive_v2.py main_interface.txt
-
-# With bitmap example
-python tft_simulator_interactive_v2.py graphic.txt
-
-# Your own sketch
-python tft_simulator_interactive_v2.py your_sketch.ino
-```
-
----
-
-**Made with ❤️ for the Arduino community**
-
-*Finally, a proper TFT simulator that actually works!*
+MIT License. See `LICENSE`.
